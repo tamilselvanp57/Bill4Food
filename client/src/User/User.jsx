@@ -4,6 +4,7 @@ import { ShoppingCart, Plus, Minus, X, ArrowLeft, Sparkles, Zap, CheckCircle2, C
 import { QRCodeSVG } from 'qrcode.react'
 import html2canvas from 'html2canvas'
 import ClickSpark from './ClickSpark'
+import UpiVerifier from './UpiVerifier'
 import { api } from '../api'
 import { MEAL_SLOTS } from '../Admin/adminData'
 const FloatingFood3D = lazy(() => import('./FloatingFood3D'))
@@ -56,8 +57,11 @@ function BillScreen({ token, total, slot, items, lines, time, onBack }) {
         padding: '32px 24px', fontFamily: "'Segoe UI', system-ui, sans-serif",
         position: 'relative', overflow: 'hidden',
       }}>
-        {/* bg glow */}
-        <div style={{ position: 'absolute', top: '30%', left: '50%', transform: 'translate(-50%,-50%)', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, #16a34a18 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <Suspense fallback={null}><FloatingFood3D /></Suspense>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 1, pointerEvents: 'none', background: 'rgba(7,26,15,0.25)' }} />
+        <div style={{ position: 'absolute', top: '30%', left: '50%', transform: 'translate(-50%,-50%)', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, #16a34a18 0%, transparent 70%)', pointerEvents: 'none', zIndex: 2 }} />
+
+        <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
 
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 200 }}
           style={{ marginBottom: 16, width: 56, height: 56, borderRadius: '50%', background: G, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 0 32px ${G}60` }}>
@@ -134,6 +138,7 @@ function BillScreen({ token, total, slot, items, lines, time, onBack }) {
             <ArrowLeft size={16} /> New Order
           </motion.button>
         </div>
+        </div>{/* end zIndex wrapper */}
       </div>
     </ClickSpark>
   )
@@ -141,9 +146,9 @@ function BillScreen({ token, total, slot, items, lines, time, onBack }) {
 
 /* ── Token Screen ────────────────────────────────────────────── */
 function TokenScreen({ token, total, slot, items, lines, time, onBack }) {
-  const [copied, setCopied] = useState(false)
-  const [paid,   setPaid]   = useState(false)
-  const [confirming, setConfirming] = useState(false)
+  const [copied,    setCopied]    = useState(false)
+  const [paid,      setPaid]      = useState(false)
+  const [verifying, setVerifying] = useState(false)
   const upiUrl = makeUpiUrl(total, token)
 
   if (paid) return <BillScreen token={token} total={total} slot={slot} items={items} lines={lines} time={time} onBack={onBack} />
@@ -154,16 +159,9 @@ function TokenScreen({ token, total, slot, items, lines, time, onBack }) {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const handlePaid = async () => {
-    setConfirming(true)
-    try {
-      await api.confirmPayment(token, { status: 'Paid' })
-    } catch (_) {
-      // best-effort — still show bill even if network fails
-    } finally {
-      setConfirming(false)
-      setPaid(true)
-    }
+  const handleVerified = async ({ txnRef, payerUpiId }) => {
+    try { await api.confirmPayment(token, { status: 'Paid', txnRef, payerUpiId }) } catch (_) {}
+    setPaid(true)
   }
 
   return (
@@ -176,7 +174,11 @@ function TokenScreen({ token, total, slot, items, lines, time, onBack }) {
         fontFamily: "'Segoe UI', system-ui, sans-serif",
         position: 'relative', overflow: 'hidden',
       }}>
-        <div style={{ position: 'absolute', top: '30%', left: '50%', transform: 'translate(-50%,-50%)', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, #16a34a18 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <Suspense fallback={null}><FloatingFood3D /></Suspense>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 1, pointerEvents: 'none', background: 'rgba(7,26,15,0.25)' }} />
+        <div style={{ position: 'absolute', top: '30%', left: '50%', transform: 'translate(-50%,-50%)', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, #16a34a18 0%, transparent 70%)', pointerEvents: 'none', zIndex: 2 }} />
+
+        <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
 
         {[...Array(5)].map((_, i) => (
           <motion.div key={i}
@@ -254,16 +256,23 @@ function TokenScreen({ token, total, slot, items, lines, time, onBack }) {
           Open GPay &#8594; Scan QR or enter UPI ID manually
         </motion.p>
 
-        <div style={{ display: 'flex', gap: 12, marginTop: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
-          <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handlePaid}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 28px', borderRadius: 50, border: 'none', background: G, color: '#fff', fontWeight: 800, fontSize: 14, cursor: confirming ? 'not-allowed' : 'pointer', boxShadow: `0 4px 20px ${G}50`, opacity: confirming ? 0.7 : 1 }}>
-            <CheckCircle2 size={16} /> {confirming ? 'Confirming…' : "I've Paid — Show Bill"}
-          </motion.button>
-          <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={onBack}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 28px', borderRadius: 50, border: `1px solid ${GMID}40`, background: 'rgba(22,163,74,0.15)', color: GMID, fontWeight: 800, fontSize: 14, cursor: 'pointer' }}>
-            <ArrowLeft size={16} /> Order Again
-          </motion.button>
-        </div>
+        {verifying ? (
+          <div style={{ marginTop: 16, width: '100%', maxWidth: 360, padding: '0 16px' }}>
+            <UpiVerifier total={total} merchantUpi={UPI_ID} token={token} onVerified={handleVerified} onCancel={() => setVerifying(false)} />
+          </div>
+        ) : (
+          <div style={{ display: 'flex', gap: 12, marginTop: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
+            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setVerifying(true)}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 28px', borderRadius: 50, border: 'none', background: G, color: '#fff', fontWeight: 800, fontSize: 14, cursor: 'pointer', boxShadow: `0 4px 20px ${G}50` }}>
+              <CheckCircle2 size={16} /> I've Paid — Verify & Get Bill
+            </motion.button>
+            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={onBack}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 28px', borderRadius: 50, border: `1px solid ${GMID}40`, background: 'rgba(22,163,74,0.15)', color: GMID, fontWeight: 800, fontSize: 14, cursor: 'pointer' }}>
+              <ArrowLeft size={16} /> Order Again
+            </motion.button>
+          </div>
+        )}
+        </div>{/* end zIndex wrapper */}
       </div>
     </ClickSpark>
   )
