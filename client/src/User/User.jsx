@@ -1,16 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ShoppingCart, Plus, Minus, X, ArrowLeft, Sparkles, Zap } from 'lucide-react'
 import ClickSpark from './ClickSpark'
-
-import imgBiryani       from '../food_images/Biriyani.jpeg'
-import imgChapati       from '../food_images/Chapathi.jpeg'
-import imgChickenNoodles from '../food_images/chicken noodles.jpeg'
-import imgChickenRice   from '../food_images/Chicken RIce.jpeg'
-import imgFullMeals     from '../food_images/Full Meals.jpeg'
-import imgParotta       from '../food_images/parotta.jpeg'
-import imgVegNoodles    from '../food_images/veg noodles.jpeg'
-import imgVegRice       from '../food_images/Veg RIce.jpeg'
+import { api } from '../api'
+import { MEAL_SLOTS } from '../Admin/adminData'
 
 /* ── theme ───────────────────────────────────────────────────── */
 const G     = '#16a34a'
@@ -22,19 +15,12 @@ const GMUTE = '#4b7c5e'
 const fadeUp  = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: 'easeOut' } } }
 const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.07 } } }
 
-const MENU = [
-  { id: 1, name: 'Full Meals',       price: 60, tag: 'Best Seller', tagColor: '#fbbf24', img: imgFullMeals,      desc: 'Rice · Sambar · Rasam · 3 Curries · Papad' },
-  { id: 2, name: 'Chicken Biryani', price: 90, tag: 'Spicy',       tagColor: '#ef4444', img: imgBiryani,        desc: 'Fragrant basmati with tender chicken' },
-  { id: 3, name: 'Chapati',         price: 25, tag: null,           tagColor: '',        img: imgChapati,        desc: 'Soft wheat chapatis with curry' },
-  { id: 4, name: 'Chicken Rice',    price: 55, tag: 'Fresh',        tagColor: '#f59e0b', img: imgChickenRice,    desc: 'Wok-tossed chicken fried rice' },
-  { id: 5, name: 'Parotta',         price: 40, tag: 'Popular',      tagColor: '#ea580c', img: imgParotta,        desc: 'Flaky parotta with spicy salna' },
-  { id: 6, name: 'Veg Rice',        price: 40, tag: null,           tagColor: '',        img: imgVegRice,        desc: 'Flavourful vegetable fried rice' },
-  { id: 7, name: 'Chicken Noodles', price: 60, tag: 'Hot Pick',     tagColor: '#a855f7', img: imgChickenNoodles, desc: 'Stir-fried noodles with chicken' },
-  { id: 8, name: 'Veg Noodles',     price: 45, tag: null,           tagColor: '',        img: imgVegNoodles,     desc: 'Stir-fried noodles with fresh veggies' },
-]
+function slotLabel(id) {
+  return MEAL_SLOTS.find((s) => s.id === id)?.label ?? id
+}
 
 /* ── Token Screen ────────────────────────────────────────────── */
-function TokenScreen({ token, onBack }) {
+function TokenScreen({ token, total, onBack }) {
   return (
     <ClickSpark sparkColor={GMID} sparkSize={12} sparkRadius={22} sparkCount={10} duration={500}>
       <div style={{
@@ -127,8 +113,9 @@ function TokenScreen({ token, onBack }) {
 
           {/* order summary */}
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: GMUTE, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>Order Total</div>
-            <div style={{ fontSize: 28, fontWeight: 900, color: GDARK }}>{token}</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: GMUTE, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>Your token</div>
+            <div style={{ fontSize: 36, fontWeight: 900, color: GDARK }}>{token}</div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: GDARK, marginTop: 8 }}>₹{total}</div>
             <div style={{ fontSize: 11, color: GMUTE, marginTop: 4 }}>SECE Canteen · Powered by Bill4Food</div>
           </div>
         </motion.div>
@@ -156,7 +143,10 @@ function TokenScreen({ token, onBack }) {
 /* ── Cart Drawer ─────────────────────────────────────────────── */
 function CartDrawer({ cart, menu, onUpdate, onClose, onCheckout }) {
   const items = Object.entries(cart).filter(([, qty]) => qty > 0)
-  const total = items.reduce((s, [id, qty]) => s + menu.find(m => m.id === +id).price * qty, 0)
+  const total = items.reduce((s, [id, qty]) => {
+    const row = menu.find((m) => String(m.id) === String(id))
+    return s + (row ? row.price * qty : 0)
+  }, 0)
 
   return (
     <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
@@ -190,7 +180,8 @@ function CartDrawer({ cart, menu, onUpdate, onClose, onCheckout }) {
         <>
           <div style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
             {items.map(([id, qty]) => {
-              const item = menu.find(m => m.id === +id)
+              const item = menu.find((m) => String(m.id) === String(id))
+              if (!item) return null
               return (
                 <div key={id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: `1px solid ${GMID}15` }}>
                   <img src={item.img} alt={item.name} style={{ width: 50, height: 50, borderRadius: 10, objectFit: 'cover', flexShrink: 0 }} />
@@ -199,11 +190,11 @@ function CartDrawer({ cart, menu, onUpdate, onClose, onCheckout }) {
                     <div style={{ fontSize: 12, color: GMID, fontWeight: 700, marginTop: 2 }}>₹{item.price} × {qty} = ₹{item.price * qty}</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <button onClick={() => onUpdate(+id, -1)} style={{ width: 26, height: 26, borderRadius: '50%', border: `1px solid ${GMID}30`, background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <button onClick={() => onUpdate(id, -1)} style={{ width: 26, height: 26, borderRadius: '50%', border: `1px solid ${GMID}30`, background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <Minus size={11} color={GMID} />
                     </button>
                     <span style={{ fontWeight: 800, fontSize: 14, color: '#fff', minWidth: 18, textAlign: 'center' }}>{qty}</span>
-                    <button onClick={() => onUpdate(+id, 1)} style={{ width: 26, height: 26, borderRadius: '50%', border: 'none', background: G, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <button onClick={() => onUpdate(id, 1)} style={{ width: 26, height: 26, borderRadius: '50%', border: 'none', background: G, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <Plus size={11} color="#fff" />
                     </button>
                   </div>
@@ -267,7 +258,7 @@ function MenuCard({ item, qty, onUpdate }) {
               position: 'absolute', top: 12, left: 12,
               fontSize: 10, fontWeight: 800, padding: '4px 10px', borderRadius: 50,
               background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)',
-              color: item.tagColor, border: `1px solid ${item.tagColor}40`,
+              color: item.tagColor || GMID, border: `1px solid ${(item.tagColor || GMID)}40`,
               letterSpacing: 0.5,
             }}>{item.tag}</motion.span>
         )}
@@ -291,7 +282,7 @@ function MenuCard({ item, qty, onUpdate }) {
           background: `linear-gradient(135deg, #fff 0%, ${GMID} 100%)`,
           WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
         }}>{item.name}</h3>
-        <p style={{ fontSize: 12, color: '#ffffff50', margin: '0 0 16px', lineHeight: 1.5 }}>{item.desc}</p>
+        <p style={{ fontSize: 12, color: '#ffffff50', margin: '0 0 16px', lineHeight: 1.5 }}>{item.desc || 'Fresh from the canteen'}</p>
 
         {qty === 0 ? (
           <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.94 }}
@@ -331,23 +322,73 @@ function MenuCard({ item, qty, onUpdate }) {
 
 /* ── Root ────────────────────────────────────────────────────── */
 export default function User() {
-  const [cart, setCart]         = useState({})
+  const [cart, setCart] = useState({})
   const [cartOpen, setCartOpen] = useState(false)
-  const [token, setToken]       = useState(null)
+  const [orderToken, setOrderToken] = useState(null)
+  const [orderTotal, setOrderTotal] = useState(0)
+  const [shop, setShop] = useState({ slot: null, items: [], message: '' })
+  const [shopLoading, setShopLoading] = useState(true)
+  const [shopError, setShopError] = useState(null)
 
-  const update = (id, delta) =>
-    setCart(prev => ({ ...prev, [id]: Math.max(0, (prev[id] || 0) + delta) }))
+  const loadShop = async (slot) => {
+    setShopLoading(true)
+    setShopError(null)
+    try {
+      let r = await api.getShopMenu(slot ?? 'auto')
+      if ((!r.slot || !r.items?.length) && slot == null) {
+        r = await api.getShopMenu('lunch')
+      }
+      setShop(r)
+    } catch (e) {
+      setShopError(e.message || 'Could not load menu')
+      setShop({ slot: null, items: [], message: '' })
+    } finally {
+      setShopLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadShop(null)
+  }, [])
+
+  const menu = shop.items || []
+
+  const update = (id, delta) => {
+    const key = String(id)
+    setCart((prev) => ({ ...prev, [key]: Math.max(0, (prev[key] || 0) + delta) }))
+  }
 
   const totalItems = Object.values(cart).reduce((s, q) => s + q, 0)
 
-  const checkout = () => {
-    const total = Object.entries(cart).reduce((s, [id, qty]) => s + (MENU.find(m => m.id === +id)?.price || 0) * qty, 0)
-    setToken(`₹${total}`)
-    setCartOpen(false)
-    setCart({})
+  const checkout = async () => {
+    const slot = shop.slot || 'lunch'
+    const lines = Object.entries(cart)
+      .filter(([, q]) => q > 0)
+      .map(([id, qty]) => ({ itemId: id, qty }))
+    if (lines.length === 0) return
+    try {
+      const order = await api.createOrder({ slot, items: lines })
+      setOrderToken(order.token)
+      setOrderTotal(order.total)
+      setCartOpen(false)
+      setCart({})
+    } catch (e) {
+      window.alert(e.message || 'Order failed')
+    }
   }
 
-  if (token) return <TokenScreen token={token} onBack={() => setToken(null)} />
+  if (orderToken) {
+    return (
+      <TokenScreen
+        token={orderToken}
+        total={orderTotal}
+        onBack={() => {
+          setOrderToken(null)
+          setOrderTotal(0)
+        }}
+      />
+    )
+  }
 
   return (
     <ClickSpark sparkColor={GMID} sparkSize={10} sparkRadius={20} sparkCount={8} duration={500}>
@@ -437,6 +478,32 @@ export default function User() {
             <p style={{ fontSize: 15, color: GMID, opacity: 0.6, letterSpacing: 2 }}>
               Fresh · Hot · Ready in minutes
             </p>
+            {shop.slot && (
+              <p style={{ fontSize: 13, color: GMID, marginTop: 10, fontWeight: 700 }}>
+                Now serving: {slotLabel(shop.slot)}
+              </p>
+            )}
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 14, flexWrap: 'wrap' }}>
+              {MEAL_SLOTS.map((s) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => loadShop(s.id)}
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: 50,
+                    border: `1px solid ${GMID}40`,
+                    background: shop.slot === s.id ? `${G}35` : 'transparent',
+                    color: GMID,
+                    fontWeight: 700,
+                    fontSize: 12,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
           </motion.div>
 
           {/* floating pills */}
@@ -456,10 +523,24 @@ export default function User() {
 
         {/* ── Menu Grid ── */}
         <main style={{ maxWidth: 1060, margin: '0 auto', padding: '0 24px 60px', position: 'relative', zIndex: 1 }}>
+          {shopLoading && (
+            <p style={{ textAlign: 'center', color: GMID }}>Loading menu…</p>
+          )}
+          {shopError && (
+            <p style={{ textAlign: 'center', color: '#f87171' }}>{shopError}</p>
+          )}
+          {!shopLoading && !shopError && !menu.length && (
+            <p style={{ textAlign: 'center', color: GMID }}>{shop.message || 'No items available for this slot. Pick another meal time above.'}</p>
+          )}
           <motion.div variants={stagger} initial="hidden" animate="show"
             style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 24, perspective: 1000 }}>
-            {MENU.map(item => (
-              <MenuCard key={item.id} item={item} qty={cart[item.id] || 0} onUpdate={update} />
+            {menu.map((item) => (
+              <MenuCard
+                key={item.id}
+                item={item}
+                qty={cart[String(item.id)] || 0}
+                onUpdate={update}
+              />
             ))}
           </motion.div>
         </main>
@@ -471,7 +552,7 @@ export default function User() {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 onClick={() => setCartOpen(false)}
                 style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 150, backdropFilter: 'blur(4px)' }} />
-              <CartDrawer cart={cart} menu={MENU} onUpdate={update} onClose={() => setCartOpen(false)} onCheckout={checkout} />
+              <CartDrawer cart={cart} menu={menu} onUpdate={update} onClose={() => setCartOpen(false)} onCheckout={checkout} />
             </>
           )}
         </AnimatePresence>

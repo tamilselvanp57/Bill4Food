@@ -3,10 +3,10 @@ import { motion } from 'framer-motion'
 import { ClipboardList, Clock } from 'lucide-react'
 import { G, GDARK, GLIGHT, GMID, GMUTE, stagger, fadeUp, MEAL_SLOTS } from './adminData'
 
-export default function OrdersTab({ orders, setOrders }) {
+export default function OrdersTab({ orders, onServe }) {
   const [filter, setFilter] = useState('all')
 
-  const serve    = token => setOrders(prev => prev.map(o => o.token === token ? { ...o, status: 'Served' } : o))
+  const serve = (token) => onServe(token)
   const filtered = filter === 'all' ? orders : orders.filter(o => o.slot === filter)
   const slotMeta = id => MEAL_SLOTS.find(s => s.id === id) || { color: GMUTE, label: id, bg: GLIGHT, border: GMID }
 

@@ -6,23 +6,25 @@ import {
 } from 'lucide-react'
 import { G, GDARK, GLIGHT, GMID, GMUTE, stagger, fadeUp, MEAL_SLOTS, isSlotActive } from './adminData'
 
-/* ── Add Item Modal ──────────────────────────────────────────── */
 function AddItemModal({ slotId, onAdd, onClose }) {
   const [form, setForm] = useState({ name: '', price: '', qty: '', img: '' })
-  const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
+  const set = (k, v) => setForm((p) => ({ ...p, [k]: v }))
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault()
     if (!form.name || !form.price || !form.qty) return
-    onAdd(slotId, {
-      id: `${slotId[0]}${Date.now()}`,
-      name: form.name,
-      price: Number(form.price),
-      qty: Number(form.qty),
-      active: true,
-      img: form.img || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&q=80',
-    })
-    onClose()
+    try {
+      await onAdd(slotId, {
+        name: form.name,
+        price: Number(form.price),
+        qty: Number(form.qty),
+        active: true,
+        img: form.img || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&q=80',
+      })
+      onClose()
+    } catch (err) {
+      window.alert(err.message || 'Could not add item')
+    }
   }
 
   return (
@@ -32,7 +34,7 @@ function AddItemModal({ slotId, onAdd, onClose }) {
         style={{ background: '#fff', borderRadius: 20, padding: '28px 28px', width: 400, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <h3 style={{ fontWeight: 800, fontSize: 18, color: GDARK, margin: 0 }}>Add Menu Item</h3>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: GMUTE }}><X size={20} /></button>
+          <button type="button" onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: GMUTE }}><X size={20} /></button>
         </div>
         <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {[
@@ -44,7 +46,7 @@ function AddItemModal({ slotId, onAdd, onClose }) {
             <div key={key}>
               <label style={{ fontSize: 12, fontWeight: 700, color: GMUTE, display: 'block', marginBottom: 4 }}>{label}</label>
               <input type={type} placeholder={placeholder} value={form[key]}
-                onChange={e => set(key, e.target.value)}
+                onChange={(e) => set(key, e.target.value)}
                 style={{ width: '100%', padding: '10px 12px', borderRadius: 10, border: `1.5px solid ${GMID}`, fontSize: 14, outline: 'none', boxSizing: 'border-box', color: GDARK }} />
             </div>
           ))}
@@ -58,7 +60,6 @@ function AddItemModal({ slotId, onAdd, onClose }) {
   )
 }
 
-/* ── Slot Section ────────────────────────────────────────────── */
 function SlotSection({ slot, items, slotOpen, onToggleSlot, onToggleItem, onRemove, onAddItem }) {
   const [showModal, setShowModal] = useState(false)
   const autoActive = isSlotActive(slot)
@@ -67,7 +68,6 @@ function SlotSection({ slot, items, slotOpen, onToggleSlot, onToggleItem, onRemo
     <motion.div variants={fadeUp}
       style={{ background: '#fff', borderRadius: 20, overflow: 'hidden', border: `2px solid ${slotOpen ? slot.border : '#e5e7eb'}`, marginBottom: 24, boxShadow: '0 4px 16px rgba(0,0,0,0.05)' }}>
 
-      {/* slot header */}
       <div style={{ padding: '16px 20px', background: slotOpen ? slot.bg : '#f9fafb', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <UtensilsCrossed size={20} color={slotOpen ? slot.color : '#9ca3af'} />
@@ -86,15 +86,13 @@ function SlotSection({ slot, items, slotOpen, onToggleSlot, onToggleItem, onRemo
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          {/* add item button */}
-          <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+          <motion.button type="button" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
             onClick={() => setShowModal(true)}
             style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '7px 14px', borderRadius: 50, border: 'none', background: slotOpen ? slot.color : '#e5e7eb', color: slotOpen ? '#fff' : '#9ca3af', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
             <Plus size={13} /> Add
           </motion.button>
 
-          {/* slot open/close toggle */}
-          <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+          <motion.button type="button" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
             onClick={() => onToggleSlot(slot.id)}
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 6,
@@ -108,13 +106,12 @@ function SlotSection({ slot, items, slotOpen, onToggleSlot, onToggleItem, onRemo
         </div>
       </div>
 
-      {/* items grid */}
       <AnimatePresence>
         {slotOpen && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
             style={{ overflow: 'hidden' }}>
             <div style={{ padding: '16px 20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 14 }}>
-              {items.map(item => (
+              {items.map((item) => (
                 <motion.div key={item.id} layout
                   style={{ background: '#f9fafb', borderRadius: 14, overflow: 'hidden', border: `1.5px solid ${item.active ? slot.border : '#fecaca'}`, opacity: item.active ? 1 : 0.7 }}>
                   <div style={{ position: 'relative', height: 100 }}>
@@ -133,11 +130,11 @@ function SlotSection({ slot, items, slotOpen, onToggleSlot, onToggleItem, onRemo
                       <Package size={11} /> {item.qty} left
                     </div>
                     <div style={{ display: 'flex', gap: 6 }}>
-                      <button onClick={() => onToggleItem(slot.id, item.id)}
+                      <button type="button" onClick={() => onToggleItem(slot.id, item.id)}
                         style={{ flex: 1, padding: '6px', borderRadius: 8, border: 'none', background: item.active ? '#fee2e2' : GLIGHT, color: item.active ? '#dc2626' : G, fontWeight: 700, fontSize: 11, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
                         {item.active ? <><ToggleRight size={13} /> Off</> : <><ToggleLeft size={13} /> On</>}
                       </button>
-                      <button onClick={() => onRemove(slot.id, item.id)}
+                      <button type="button" onClick={() => onRemove(slot.id, item.id)}
                         style={{ width: 30, height: 30, borderRadius: 8, border: 'none', background: '#fee2e2', color: '#dc2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <Trash2 size={13} />
                       </button>
@@ -155,7 +152,6 @@ function SlotSection({ slot, items, slotOpen, onToggleSlot, onToggleItem, onRemo
         )}
       </AnimatePresence>
 
-      {/* closed state */}
       {!slotOpen && (
         <div style={{ padding: '14px 20px', textAlign: 'center', fontSize: 13, color: '#9ca3af', fontWeight: 600 }}>
           <PowerOff size={14} style={{ display: 'inline', marginRight: 6 }} />
@@ -163,7 +159,6 @@ function SlotSection({ slot, items, slotOpen, onToggleSlot, onToggleItem, onRemo
         </div>
       )}
 
-      {/* add item modal */}
       <AnimatePresence>
         {showModal && <AddItemModal slotId={slot.id} onAdd={onAddItem} onClose={() => setShowModal(false)} />}
       </AnimatePresence>
@@ -171,20 +166,7 @@ function SlotSection({ slot, items, slotOpen, onToggleSlot, onToggleItem, onRemo
   )
 }
 
-/* ── MenuTab root ────────────────────────────────────────────── */
-export default function MenuTab({ menu, setMenu, slotStatus, setSlotStatus }) {
-  const toggleSlot = (slotId) =>
-    setSlotStatus(p => ({ ...p, [slotId]: !p[slotId] }))
-
-  const toggleItem = (slotId, itemId) =>
-    setMenu(p => ({ ...p, [slotId]: p[slotId].map(i => i.id === itemId ? { ...i, active: !i.active } : i) }))
-
-  const removeItem = (slotId, itemId) =>
-    setMenu(p => ({ ...p, [slotId]: p[slotId].filter(i => i.id !== itemId) }))
-
-  const addItem = (slotId, item) =>
-    setMenu(p => ({ ...p, [slotId]: [...p[slotId], item] }))
-
+export default function MenuTab({ menu, slotStatus, onToggleSlot, onToggleItem, onRemove, onAddItem }) {
   return (
     <motion.div variants={stagger} initial="hidden" animate="show">
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
@@ -192,16 +174,16 @@ export default function MenuTab({ menu, setMenu, slotStatus, setSlotStatus }) {
         <h2 style={{ fontWeight: 900, fontSize: 24, color: GDARK, margin: 0 }}>Menu Management</h2>
       </div>
 
-      {MEAL_SLOTS.map(slot => (
+      {MEAL_SLOTS.map((slot) => (
         <SlotSection
           key={slot.id}
           slot={slot}
           items={menu[slot.id] || []}
           slotOpen={slotStatus[slot.id]}
-          onToggleSlot={toggleSlot}
-          onToggleItem={toggleItem}
-          onRemove={removeItem}
-          onAddItem={addItem}
+          onToggleSlot={onToggleSlot}
+          onToggleItem={onToggleItem}
+          onRemove={onRemove}
+          onAddItem={onAddItem}
         />
       ))}
     </motion.div>

@@ -2,15 +2,12 @@ import { motion } from 'framer-motion'
 import { CalendarDays, CheckCircle, XCircle } from 'lucide-react'
 import { G, GDARK, GLIGHT, GMID, GMUTE, ALL_DAYS, formatDate, getNow } from './adminData'
 
-export default function WorkingDayPanel({ workingDays, setWorkingDays }) {
+export default function WorkingDayPanel({ workingDays, onToggleDay }) {
   const today     = getNow().toLocaleDateString('en-IN', { weekday: 'long' })
   const isToday   = (day) => day === today
   const isWorking = (day) => workingDays.includes(day)
 
-  const toggle = (day) =>
-    setWorkingDays(prev =>
-      prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
-    )
+  const toggle = (day) => onToggleDay(day)
 
   const todayWorking = isWorking(today)
 
