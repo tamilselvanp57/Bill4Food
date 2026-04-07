@@ -207,7 +207,7 @@ PATCH  /api/orders/:token   → mark served
 
 | Layer | Technology |
 |---|---|
-| Frontend | Next.js, Tailwind CSS |
+| Frontend | React, Tailwind CSS |
 | Backend | Node.js + Express |
 | Database | MongoDB |
 | Optional | Socket.io (real-time updates) |
