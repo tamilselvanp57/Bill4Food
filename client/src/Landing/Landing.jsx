@@ -6,6 +6,7 @@ import {
   UtensilsCrossed, QrCode, Ticket, ShieldCheck,
   BarChart3, Zap, ChevronRight, CheckCircle2, ArrowRight,
 } from 'lucide-react'
+import FoodScene3DSection from './FoodScene3D'
 const LoginModal = lazy(() => import('./LoginModal'))
 
 const G     = '#16a34a'
@@ -468,6 +469,7 @@ export default function Landing() {
     <div style={{ minHeight: '100vh', background: '#ffffff', color: GDARK, overflowX: 'hidden' }}>
       <Navbar onLogin={() => setLoginOpen(true)} />
       <Hero   onLogin={() => setLoginOpen(true)} />
+      <FoodScene3DSection />
       <Features />
       <Stats />
       <HowItWorks />

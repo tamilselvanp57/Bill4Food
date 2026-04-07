@@ -1,11 +1,14 @@
 import { motion } from 'framer-motion'
 import { ShoppingBag, UtensilsCrossed, IndianRupee, Clock, Trophy, BarChart3 } from 'lucide-react'
 import { G, GDARK, GLIGHT, GMID, GMUTE, stagger, fadeUp } from './adminData'
+import imgFullMeals  from '../food_images/Full Meals.jpeg'
+import imgBiryani    from '../food_images/Biriyani.jpeg'
+import imgParotta    from '../food_images/parotta.jpeg'
 
 const topItems = [
-  { name: 'Veg Meals',       orders: 10, img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=80&q=80' },
-  { name: 'Chicken Biryani', orders: 7,  img: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=80&q=80' },
-  { name: 'Parotta + Salna', orders: 5,  img: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=80&q=80' },
+  { name: 'Full Meals',       orders: 10, img: imgFullMeals },
+  { name: 'Chicken Biryani', orders: 7,  img: imgBiryani   },
+  { name: 'Parotta',         orders: 5,  img: imgParotta   },
 ]
 
 export default function DashboardTab({ orders, menu }) {

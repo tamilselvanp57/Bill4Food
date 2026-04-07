@@ -17,6 +17,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -26,6 +27,11 @@ body {
   background: #ffffff;
   color: #14532d;
   text-align: center;
+  overflow-x: hidden;
+}
+
+#root {
+  overflow-x: hidden;
 }
 
 @keyframes shimmer {

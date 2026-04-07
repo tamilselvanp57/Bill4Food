@@ -99,7 +99,7 @@ const ClickSpark = ({
   return (
     <div
       onClick={handleClick}
-      style={{ position: 'relative', minHeight: '100vh', ...style }}
+      style={{ position: 'relative', minHeight: '100vh', overflowX: 'hidden', ...style }}
     >
       <canvas ref={canvasRef} style={{
         position: 'fixed', top: 0, left: 0,

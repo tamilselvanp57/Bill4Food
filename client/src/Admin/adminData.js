@@ -5,6 +5,16 @@ export const GLIGHT = '#dcfce7'
 export const GMID   = '#86efac'
 export const GMUTE  = '#4b7c5e'
 
+/* ── Food image imports ──────────────────────────────────────── */
+import imgBiryani        from '../food_images/Biriyani.jpeg'
+import imgChapati        from '../food_images/Chapathi.jpeg'
+import imgChickenNoodles from '../food_images/chicken noodles.jpeg'
+import imgChickenRice    from '../food_images/Chicken RIce.jpeg'
+import imgFullMeals      from '../food_images/Full Meals.jpeg'
+import imgParotta        from '../food_images/parotta.jpeg'
+import imgVegNoodles     from '../food_images/veg noodles.jpeg'
+import imgVegRice        from '../food_images/Veg RIce.jpeg'
+
 /* ── Framer variants ─────────────────────────────────────────── */
 export const fadeUp  = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } } }
 export const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } }
@@ -22,21 +32,21 @@ export const ALL_DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Sat
 /* ── Default menu per slot ───────────────────────────────────── */
 export const DEFAULT_MENU = {
   breakfast: [
-    { id: 'b1', name: 'Idli (3)',        price: 20, qty: 60, active: true,  img: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=200&q=80' },
-    { id: 'b2', name: 'Dosa + Chutney', price: 25, qty: 50, active: true,  img: 'https://images.unsplash.com/photo-1630383249896-424e482df921?w=200&q=80' },
-    { id: 'b3', name: 'Pongal',         price: 20, qty: 40, active: false, img: 'https://images.unsplash.com/photo-1567337710282-00832b415979?w=200&q=80' },
-    { id: 'b4', name: 'Upma',           price: 15, qty: 30, active: true,  img: 'https://images.unsplash.com/photo-1645177628172-a94c1f96diag?w=200&q=80' },
+    { id: 'b1', name: 'Full Meals',      price: 60, qty: 60, active: true,  img: imgFullMeals  },
+    { id: 'b2', name: 'Chapati',         price: 25, qty: 50, active: true,  img: imgChapati    },
+    { id: 'b3', name: 'Veg Noodles',     price: 45, qty: 40, active: false, img: imgVegNoodles },
+    { id: 'b4', name: 'Veg Rice',        price: 40, qty: 30, active: true,  img: imgVegRice    },
   ],
   lunch: [
-    { id: 'l1', name: 'Veg Meals',       price: 60, qty: 50, active: true,  img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&q=80' },
-    { id: 'l2', name: 'Chicken Biryani', price: 90, qty: 30, active: true,  img: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=200&q=80' },
-    { id: 'l3', name: 'Chapati (2)',     price: 25, qty: 80, active: true,  img: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=200&q=80' },
-    { id: 'l4', name: 'Egg Rice',        price: 50, qty: 20, active: true,  img: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=200&q=80' },
+    { id: 'l1', name: 'Full Meals',       price: 60, qty: 50, active: true, img: imgFullMeals   },
+    { id: 'l2', name: 'Chicken Biryani',  price: 90, qty: 30, active: true, img: imgBiryani     },
+    { id: 'l3', name: 'Chapati',          price: 25, qty: 80, active: true, img: imgChapati     },
+    { id: 'l4', name: 'Chicken Rice',     price: 55, qty: 20, active: true, img: imgChickenRice },
   ],
   dinner: [
-    { id: 'd1', name: 'Parotta + Salna', price: 40, qty: 60, active: true,  img: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=200&q=80' },
-    { id: 'd2', name: 'Fried Rice',      price: 55, qty: 40, active: true,  img: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=200&q=80' },
-    { id: 'd3', name: 'Chapati + Curry', price: 35, qty: 50, active: true,  img: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=200&q=80' },
+    { id: 'd1', name: 'Parotta',          price: 40, qty: 60, active: true, img: imgParotta        },
+    { id: 'd2', name: 'Chicken Noodles',  price: 60, qty: 40, active: true, img: imgChickenNoodles },
+    { id: 'd3', name: 'Veg Rice',         price: 40, qty: 50, active: true, img: imgVegRice        },
   ],
 }
 

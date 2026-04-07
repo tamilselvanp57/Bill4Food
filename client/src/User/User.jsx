@@ -3,6 +3,15 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ShoppingCart, Plus, Minus, X, ArrowLeft, Sparkles, Zap } from 'lucide-react'
 import ClickSpark from './ClickSpark'
 
+import imgBiryani       from '../food_images/Biriyani.jpeg'
+import imgChapati       from '../food_images/Chapathi.jpeg'
+import imgChickenNoodles from '../food_images/chicken noodles.jpeg'
+import imgChickenRice   from '../food_images/Chicken RIce.jpeg'
+import imgFullMeals     from '../food_images/Full Meals.jpeg'
+import imgParotta       from '../food_images/parotta.jpeg'
+import imgVegNoodles    from '../food_images/veg noodles.jpeg'
+import imgVegRice       from '../food_images/Veg RIce.jpeg'
+
 /* ── theme ───────────────────────────────────────────────────── */
 const G     = '#16a34a'
 const GMID  = '#86efac'
@@ -14,12 +23,14 @@ const fadeUp  = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0, trans
 const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.07 } } }
 
 const MENU = [
-  { id: 1, name: 'Veg Meals',       price: 60, tag: 'Best Seller', tagColor: '#fbbf24', img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80',  desc: 'Rice · Sambar · Rasam · 3 Curries · Papad' },
-  { id: 2, name: 'Chicken Biryani', price: 90, tag: 'Spicy',       tagColor: '#ef4444', img: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400&q=80', desc: 'Fragrant basmati with tender chicken' },
-  { id: 3, name: 'Chapati (2)',     price: 25, tag: null,           tagColor: '',        img: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&q=80', desc: 'Soft wheat chapatis with curry' },
-  { id: 4, name: 'Egg Rice',        price: 50, tag: 'Fresh',        tagColor: '#f59e0b', img: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400&q=80', desc: 'Wok-tossed egg fried rice' },
-  { id: 5, name: 'Parotta + Salna', price: 40, tag: 'Popular',      tagColor: '#ea580c', img: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&q=80', desc: 'Flaky parotta with spicy salna' },
-  { id: 6, name: 'Cold Coffee',     price: 30, tag: 'Chilled',      tagColor: '#0ea5e9', img: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&q=80', desc: 'Creamy blended cold coffee' },
+  { id: 1, name: 'Full Meals',       price: 60, tag: 'Best Seller', tagColor: '#fbbf24', img: imgFullMeals,      desc: 'Rice · Sambar · Rasam · 3 Curries · Papad' },
+  { id: 2, name: 'Chicken Biryani', price: 90, tag: 'Spicy',       tagColor: '#ef4444', img: imgBiryani,        desc: 'Fragrant basmati with tender chicken' },
+  { id: 3, name: 'Chapati',         price: 25, tag: null,           tagColor: '',        img: imgChapati,        desc: 'Soft wheat chapatis with curry' },
+  { id: 4, name: 'Chicken Rice',    price: 55, tag: 'Fresh',        tagColor: '#f59e0b', img: imgChickenRice,    desc: 'Wok-tossed chicken fried rice' },
+  { id: 5, name: 'Parotta',         price: 40, tag: 'Popular',      tagColor: '#ea580c', img: imgParotta,        desc: 'Flaky parotta with spicy salna' },
+  { id: 6, name: 'Veg Rice',        price: 40, tag: null,           tagColor: '',        img: imgVegRice,        desc: 'Flavourful vegetable fried rice' },
+  { id: 7, name: 'Chicken Noodles', price: 60, tag: 'Hot Pick',     tagColor: '#a855f7', img: imgChickenNoodles, desc: 'Stir-fried noodles with chicken' },
+  { id: 8, name: 'Veg Noodles',     price: 45, tag: null,           tagColor: '',        img: imgVegNoodles,     desc: 'Stir-fried noodles with fresh veggies' },
 ]
 
 /* ── Token Screen ────────────────────────────────────────────── */
@@ -57,37 +68,80 @@ function TokenScreen({ token, onBack }) {
 
         <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
           style={{ color: GMID, fontSize: 15, marginBottom: 36, opacity: 0.8 }}>
-          Show this token at the counter
+          Scan the QR code below to complete your payment
         </motion.p>
 
+        {/* QR code placeholder */}
         <motion.div initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.35, type: 'spring', stiffness: 180 }}
           style={{
-            background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(20px)',
-            borderRadius: 28, border: `2px solid ${GMID}40`,
-            padding: '36px 64px', position: 'relative',
+            background: '#fff',
+            borderRadius: 24,
+            padding: 28,
             boxShadow: `0 0 60px ${G}30, 0 20px 60px rgba(0,0,0,0.4)`,
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
           }}>
-          <div style={{ position: 'absolute', left: -14, top: '50%', transform: 'translateY(-50%)', width: 28, height: 28, borderRadius: '50%', background: '#071a0f', border: `2px solid ${GMID}40` }} />
-          <div style={{ position: 'absolute', right: -14, top: '50%', transform: 'translateY(-50%)', width: 28, height: 28, borderRadius: '50%', background: '#071a0f', border: `2px solid ${GMID}40` }} />
-          <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 5, color: GMID, textTransform: 'uppercase', marginBottom: 8, opacity: 0.7 }}>Your Token</div>
-          <motion.div animate={{ textShadow: [`0 0 20px ${G}`, `0 0 40px ${G}`, `0 0 20px ${G}`] }}
-            transition={{ repeat: Infinity, duration: 2 }}
-            style={{ fontSize: 72, fontWeight: 900, color: '#fff', lineHeight: 1 }}>
-            {token}
-          </motion.div>
-          <div style={{ fontSize: 12, color: GMID, marginTop: 10, opacity: 0.6, letterSpacing: 2 }}>SECE CANTEEN</div>
+
+          {/* QR frame */}
+          <div style={{
+            width: 200, height: 200,
+            borderRadius: 16,
+            background: '#f9fafb',
+            border: `3px solid ${G}`,
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            position: 'relative', overflow: 'hidden',
+            gap: 8,
+          }}>
+            {/* corner markers */}
+            {[['0%','0%','right','bottom'],['100%','0%','left','bottom'],['0%','100%','right','top'],['100%','100%','left','top']].map(([l, t, br, bb], i) => (
+              <div key={i} style={{
+                position: 'absolute', left: l, top: t,
+                width: 28, height: 28,
+                borderTop: i < 2 ? `4px solid ${G}` : 'none',
+                borderBottom: i >= 2 ? `4px solid ${G}` : 'none',
+                borderLeft: i % 2 === 0 ? `4px solid ${G}` : 'none',
+                borderRight: i % 2 === 1 ? `4px solid ${G}` : 'none',
+                borderRadius: i === 0 ? '8px 0 0 0' : i === 1 ? '0 8px 0 0' : i === 2 ? '0 0 0 8px' : '0 0 8px 0',
+              }} />
+            ))}
+
+            {/* scan line animation */}
+            <motion.div
+              animate={{ y: [-80, 80, -80] }}
+              transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
+              style={{
+                position: 'absolute', left: 8, right: 8, height: 2,
+                background: `linear-gradient(90deg, transparent, ${G}, transparent)`,
+                boxShadow: `0 0 8px ${G}`,
+              }} />
+
+            {/* placeholder grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 3, padding: 16, opacity: 0.15 }}>
+              {Array.from({ length: 49 }, (_, i) => (
+                <div key={i} style={{ width: 16, height: 16, borderRadius: 2, background: Math.random() > 0.5 ? GDARK : 'transparent' }} />
+              ))}
+            </div>
+
+            <div style={{ position: 'absolute', bottom: 10, fontSize: 10, fontWeight: 700, color: GMUTE, letterSpacing: 2 }}>SCAN TO PAY</div>
+          </div>
+
+          {/* order summary */}
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: GMUTE, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>Order Total</div>
+            <div style={{ fontSize: 28, fontWeight: 900, color: GDARK }}>{token}</div>
+            <div style={{ fontSize: 11, color: GMUTE, marginTop: 4 }}>SECE Canteen · Powered by Bill4Food</div>
+          </div>
         </motion.div>
 
         <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-          style={{ color: GMID, fontSize: 13, marginTop: 28, opacity: 0.6 }}>
-          Listen for your token to be called
+          style={{ color: GMID, fontSize: 12, marginTop: 20, opacity: 0.5, maxWidth: 280 }}>
+          QR payment integration coming soon. Your order is confirmed.
         </motion.p>
 
         <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
           onClick={onBack}
           style={{
-            marginTop: 24, display: 'inline-flex', alignItems: 'center', gap: 8,
+            marginTop: 20, display: 'inline-flex', alignItems: 'center', gap: 8,
             padding: '13px 32px', borderRadius: 50, border: `1px solid ${GMID}40`,
             background: 'rgba(22,163,74,0.15)', color: GMID,
             fontWeight: 800, fontSize: 15, cursor: 'pointer',
@@ -287,7 +341,8 @@ export default function User() {
   const totalItems = Object.values(cart).reduce((s, q) => s + q, 0)
 
   const checkout = () => {
-    setToken(`T${Math.floor(Math.random() * 900) + 100}`)
+    const total = Object.entries(cart).reduce((s, [id, qty]) => s + (MENU.find(m => m.id === +id)?.price || 0) * qty, 0)
+    setToken(`₹${total}`)
     setCartOpen(false)
     setCart({})
   }
@@ -296,7 +351,7 @@ export default function User() {
 
   return (
     <ClickSpark sparkColor={GMID} sparkSize={10} sparkRadius={20} sparkCount={8} duration={500}>
-      <div style={{ minHeight: '100vh', background: '#071a0f', fontFamily: "'Segoe UI', system-ui, sans-serif", color: '#fff' }}>
+      <div style={{ minHeight: '100vh', background: '#071a0f', fontFamily: "'Segoe UI', system-ui, sans-serif", color: '#fff', overflowX: 'hidden' }}>
 
         {/* ── bg mesh ── */}
         <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
