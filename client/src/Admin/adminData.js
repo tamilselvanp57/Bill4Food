@@ -5,15 +5,17 @@ export const GLIGHT = '#dcfce7'
 export const GMID   = '#86efac'
 export const GMUTE  = '#4b7c5e'
 
-/* ── Food image imports ──────────────────────────────────────── */
-import imgBiryani        from '../food_images/Biriyani.jpeg'
-import imgChapati        from '../food_images/Chapathi.jpeg'
-import imgChickenNoodles from '../food_images/chicken noodles.jpeg'
-import imgChickenRice    from '../food_images/Chicken RIce.jpeg'
-import imgFullMeals      from '../food_images/Full Meals.jpeg'
-import imgParotta        from '../food_images/parotta.jpeg'
-import imgVegNoodles     from '../food_images/veg noodles.jpeg'
-import imgVegRice        from '../food_images/Veg RIce.jpeg'
+/* ── Food image public paths (served from /public/food_images) ── */
+export const IMG = {
+  biryani        : '/food_images/Biriyani.jpeg',
+  chapati        : '/food_images/Chapathi.jpeg',
+  chickenNoodles : '/food_images/chicken noodles.jpeg',
+  chickenRice    : '/food_images/Chicken RIce.jpeg',
+  fullMeals      : '/food_images/Full Meals.jpeg',
+  parotta        : '/food_images/parotta.jpeg',
+  vegNoodles     : '/food_images/veg noodles.jpeg',
+  vegRice        : '/food_images/Veg RIce.jpeg',
+}
 
 /* ── Framer variants ─────────────────────────────────────────── */
 export const fadeUp  = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } } }
@@ -32,31 +34,31 @@ export const ALL_DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Sat
 /* ── Default menu per slot ───────────────────────────────────── */
 export const DEFAULT_MENU = {
   breakfast: [
-    { id: 'b1', name: 'Full Meals',      price: 60, qty: 60, active: true,  img: imgFullMeals  },
-    { id: 'b2', name: 'Chapati',         price: 25, qty: 50, active: true,  img: imgChapati    },
-    { id: 'b3', name: 'Veg Noodles',     price: 45, qty: 40, active: false, img: imgVegNoodles },
-    { id: 'b4', name: 'Veg Rice',        price: 40, qty: 30, active: true,  img: imgVegRice    },
+    { id: 'b1', name: 'Full Meals',   price: 60, qty: 60, active: true,  img: IMG.fullMeals  },
+    { id: 'b2', name: 'Chapati',      price: 25, qty: 50, active: true,  img: IMG.chapati    },
+    { id: 'b3', name: 'Veg Noodles',  price: 45, qty: 40, active: false, img: IMG.vegNoodles },
+    { id: 'b4', name: 'Veg Rice',     price: 40, qty: 30, active: true,  img: IMG.vegRice    },
   ],
   lunch: [
-    { id: 'l1', name: 'Full Meals',       price: 60, qty: 50, active: true, img: imgFullMeals   },
-    { id: 'l2', name: 'Chicken Biryani',  price: 90, qty: 30, active: true, img: imgBiryani     },
-    { id: 'l3', name: 'Chapati',          price: 25, qty: 80, active: true, img: imgChapati     },
-    { id: 'l4', name: 'Chicken Rice',     price: 55, qty: 20, active: true, img: imgChickenRice },
+    { id: 'l1', name: 'Full Meals',      price: 60, qty: 50, active: true, img: IMG.fullMeals   },
+    { id: 'l2', name: 'Chicken Biryani', price: 90, qty: 30, active: true, img: IMG.biryani     },
+    { id: 'l3', name: 'Chapati',         price: 25, qty: 80, active: true, img: IMG.chapati     },
+    { id: 'l4', name: 'Chicken Rice',    price: 55, qty: 20, active: true, img: IMG.chickenRice },
   ],
   dinner: [
-    { id: 'd1', name: 'Parotta',          price: 40, qty: 60, active: true, img: imgParotta        },
-    { id: 'd2', name: 'Chicken Noodles',  price: 60, qty: 40, active: true, img: imgChickenNoodles },
-    { id: 'd3', name: 'Veg Rice',         price: 40, qty: 50, active: true, img: imgVegRice        },
+    { id: 'd1', name: 'Parotta',         price: 40, qty: 60, active: true, img: IMG.parotta        },
+    { id: 'd2', name: 'Chicken Noodles', price: 60, qty: 40, active: true, img: IMG.chickenNoodles },
+    { id: 'd3', name: 'Veg Rice',        price: 40, qty: 50, active: true, img: IMG.vegRice        },
   ],
 }
 
 /* ── Sample orders ───────────────────────────────────────────── */
 export const SAMPLE_ORDERS = [
-  { token: 'T001', slot: 'breakfast', items: 'Idli x2',              total: 40,  status: 'Served',  time: '08:10 AM' },
-  { token: 'T002', slot: 'lunch',     items: 'Veg Meals x1',         total: 60,  status: 'Pending', time: '12:07 PM' },
-  { token: 'T003', slot: 'lunch',     items: 'Chicken Biryani x1',   total: 90,  status: 'Pending', time: '12:09 PM' },
-  { token: 'T004', slot: 'dinner',    items: 'Parotta + Salna x1',   total: 40,  status: 'Served',  time: '06:30 PM' },
-  { token: 'T005', slot: 'lunch',     items: 'Chapati x2, Egg Rice', total: 100, status: 'Pending', time: '12:14 PM' },
+  { token: 'T001', slot: 'breakfast', items: 'Full Meals x1',        total: 60,  status: 'Served',  time: '08:10 AM' },
+  { token: 'T002', slot: 'lunch',     items: 'Chicken Biryani x1',   total: 90,  status: 'Pending', time: '12:07 PM' },
+  { token: 'T003', slot: 'lunch',     items: 'Full Meals x1',        total: 60,  status: 'Pending', time: '12:09 PM' },
+  { token: 'T004', slot: 'dinner',    items: 'Parotta x1',           total: 40,  status: 'Served',  time: '06:30 PM' },
+  { token: 'T005', slot: 'lunch',     items: 'Chapati x2',           total: 50,  status: 'Pending', time: '12:14 PM' },
 ]
 
 /* ── Helpers ─────────────────────────────────────────────────── */
@@ -72,9 +74,8 @@ export function formatTime(d) {
   return d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
 }
 
-/* Returns true if current time is within slot window */
 export function isSlotActive(slot) {
-  const now   = new Date()
+  const now = new Date()
   const [sh, sm] = slot.start.split(':').map(Number)
   const [eh, em] = slot.end.split(':').map(Number)
   const start = new Date(); start.setHours(sh, sm, 0)

@@ -1,58 +1,120 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   UtensilsCrossed, Plus, ToggleLeft, ToggleRight,
-  Trash2, CheckCircle, Clock, Package, PowerOff, Power, X,
+  Trash2, CheckCircle, Clock, Package, PowerOff, Power, X, ImagePlus,
 } from 'lucide-react'
 import { G, GDARK, GLIGHT, GMID, GMUTE, stagger, fadeUp, MEAL_SLOTS, isSlotActive } from './adminData'
 
+/* ── Add Item Modal ──────────────────────────────────────────── */
 function AddItemModal({ slotId, onAdd, onClose }) {
-  const [form, setForm] = useState({ name: '', price: '', qty: '', img: '' })
-  const set = (k, v) => setForm((p) => ({ ...p, [k]: v }))
+  const [form,    setForm]    = useState({ name: '', price: '', qty: '' })
+  const [imgSrc,  setImgSrc]  = useState('')
+  const [preview, setPreview] = useState('')
+  const [loading, setLoading] = useState(false)
+  const fileRef = useRef(null)
+
+  const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
+
+  const handleFile = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      setImgSrc(ev.target.result)
+      setPreview(ev.target.result)
+    }
+    reader.readAsDataURL(file)
+  }
 
   const submit = async (e) => {
     e.preventDefault()
     if (!form.name || !form.price || !form.qty) return
+    setLoading(true)
     try {
       await onAdd(slotId, {
-        name: form.name,
-        price: Number(form.price),
-        qty: Number(form.qty),
+        name:   form.name,
+        price:  Number(form.price),
+        qty:    Number(form.qty),
         active: true,
-        img: form.img || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&q=80',
+        img:    imgSrc || '/food_images/Full Meals.jpeg',
       })
       onClose()
     } catch (err) {
       window.alert(err.message || 'Could not add item')
+    } finally {
+      setLoading(false)
     }
   }
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
-        style={{ background: '#fff', borderRadius: 20, padding: '28px 28px', width: 400, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+        style={{ background: '#fff', borderRadius: 20, padding: '28px', width: 420, boxShadow: '0 20px 60px rgba(0,0,0,0.2)', maxHeight: '90vh', overflowY: 'auto' }}>
+
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <h3 style={{ fontWeight: 800, fontSize: 18, color: GDARK, margin: 0 }}>Add Menu Item</h3>
           <button type="button" onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: GMUTE }}><X size={20} /></button>
         </div>
-        <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+
+        <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+          {/* image upload */}
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: GMUTE, display: 'block', marginBottom: 6 }}>Food Image</label>
+            <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{ display: 'none' }} />
+            <div
+              onClick={() => fileRef.current?.click()}
+              style={{
+                width: '100%', height: 140, borderRadius: 12,
+                border: `2px dashed ${preview ? G : GMID}`,
+                background: preview ? 'transparent' : GLIGHT,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', overflow: 'hidden', position: 'relative',
+              }}>
+              {preview ? (
+                <>
+                  <img src={preview} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.35)'; e.currentTarget.firstChild.style.opacity = 1 }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,0,0,0)';    e.currentTarget.firstChild.style.opacity = 0 }}>
+                    <span style={{ color: '#fff', fontWeight: 700, fontSize: 13, opacity: 0, transition: 'opacity 0.2s' }}>Change Image</span>
+                  </div>
+                </>
+              ) : (
+                <div style={{ textAlign: 'center', color: GMUTE }}>
+                  <ImagePlus size={28} style={{ marginBottom: 6 }} />
+                  <div style={{ fontSize: 13, fontWeight: 600 }}>Click to upload image</div>
+                  <div style={{ fontSize: 11, marginTop: 2 }}>JPG, PNG, WEBP</div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* text fields */}
           {[
-            { label: 'Item Name', key: 'name', type: 'text',   placeholder: 'e.g. Masala Dosa' },
-            { label: 'Price (₹)', key: 'price', type: 'number', placeholder: 'e.g. 30' },
-            { label: 'Quantity',  key: 'qty',   type: 'number', placeholder: 'e.g. 50' },
-            { label: 'Image URL (optional)', key: 'img', type: 'text', placeholder: 'https://...' },
+            { label: 'Item Name', key: 'name',  type: 'text',   placeholder: 'e.g. Masala Dosa' },
+            { label: 'Price (₹)', key: 'price', type: 'number', placeholder: 'e.g. 30'          },
+            { label: 'Quantity',  key: 'qty',   type: 'number', placeholder: 'e.g. 50'          },
           ].map(({ label, key, type, placeholder }) => (
             <div key={key}>
               <label style={{ fontSize: 12, fontWeight: 700, color: GMUTE, display: 'block', marginBottom: 4 }}>{label}</label>
-              <input type={type} placeholder={placeholder} value={form[key]}
-                onChange={(e) => set(key, e.target.value)}
-                style={{ width: '100%', padding: '10px 12px', borderRadius: 10, border: `1.5px solid ${GMID}`, fontSize: 14, outline: 'none', boxSizing: 'border-box', color: GDARK }} />
+              <input
+                type={type} placeholder={placeholder} value={form[key]}
+                onChange={e => set(key, e.target.value)}
+                required
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 10, border: `1.5px solid ${GMID}`, fontSize: 14, outline: 'none', boxSizing: 'border-box', color: GDARK }}
+                onFocus={e => e.target.style.borderColor = G}
+                onBlur={e  => e.target.style.borderColor = GMID}
+              />
             </div>
           ))}
+
           <motion.button type="submit" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-            style={{ marginTop: 8, padding: '11px', borderRadius: 12, border: 'none', background: `linear-gradient(135deg, ${G}, #15803d)`, color: '#fff', fontWeight: 800, fontSize: 14, cursor: 'pointer' }}>
-            Add Item
+            disabled={loading}
+            style={{ marginTop: 4, padding: '12px', borderRadius: 12, border: 'none', background: `linear-gradient(135deg, ${G}, #15803d)`, color: '#fff', fontWeight: 800, fontSize: 14, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1 }}>
+            {loading ? 'Adding…' : 'Add Item'}
           </motion.button>
         </form>
       </motion.div>
@@ -60,6 +122,7 @@ function AddItemModal({ slotId, onAdd, onClose }) {
   )
 }
 
+/* ── Slot Section ────────────────────────────────────────────── */
 function SlotSection({ slot, items, slotOpen, onToggleSlot, onToggleItem, onRemove, onAddItem }) {
   const [showModal, setShowModal] = useState(false)
   const autoActive = isSlotActive(slot)
@@ -68,6 +131,7 @@ function SlotSection({ slot, items, slotOpen, onToggleSlot, onToggleItem, onRemo
     <motion.div variants={fadeUp}
       style={{ background: '#fff', borderRadius: 20, overflow: 'hidden', border: `2px solid ${slotOpen ? slot.border : '#e5e7eb'}`, marginBottom: 24, boxShadow: '0 4px 16px rgba(0,0,0,0.05)' }}>
 
+      {/* slot header */}
       <div style={{ padding: '16px 20px', background: slotOpen ? slot.bg : '#f9fafb', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <UtensilsCrossed size={20} color={slotOpen ? slot.color : '#9ca3af'} />
@@ -94,24 +158,19 @@ function SlotSection({ slot, items, slotOpen, onToggleSlot, onToggleItem, onRemo
 
           <motion.button type="button" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
             onClick={() => onToggleSlot(slot.id)}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              padding: '7px 14px', borderRadius: 50, border: 'none', cursor: 'pointer',
-              background: slotOpen ? '#fee2e2' : GLIGHT,
-              color: slotOpen ? '#dc2626' : G,
-              fontWeight: 700, fontSize: 12,
-            }}>
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 50, border: 'none', cursor: 'pointer', background: slotOpen ? '#fee2e2' : GLIGHT, color: slotOpen ? '#dc2626' : G, fontWeight: 700, fontSize: 12 }}>
             {slotOpen ? <><PowerOff size={13} /> Shut Down</> : <><Power size={13} /> Open</>}
           </motion.button>
         </div>
       </div>
 
+      {/* items grid */}
       <AnimatePresence>
         {slotOpen && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
             style={{ overflow: 'hidden' }}>
             <div style={{ padding: '16px 20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 14 }}>
-              {items.map((item) => (
+              {items.map(item => (
                 <motion.div key={item.id} layout
                   style={{ background: '#f9fafb', borderRadius: 14, overflow: 'hidden', border: `1.5px solid ${item.active ? slot.border : '#fecaca'}`, opacity: item.active ? 1 : 0.7 }}>
                   <div style={{ position: 'relative', height: 100 }}>
@@ -166,6 +225,7 @@ function SlotSection({ slot, items, slotOpen, onToggleSlot, onToggleItem, onRemo
   )
 }
 
+/* ── MenuTab root ────────────────────────────────────────────── */
 export default function MenuTab({ menu, slotStatus, onToggleSlot, onToggleItem, onRemove, onAddItem }) {
   return (
     <motion.div variants={stagger} initial="hidden" animate="show">
@@ -174,7 +234,7 @@ export default function MenuTab({ menu, slotStatus, onToggleSlot, onToggleItem, 
         <h2 style={{ fontWeight: 900, fontSize: 24, color: GDARK, margin: 0 }}>Menu Management</h2>
       </div>
 
-      {MEAL_SLOTS.map((slot) => (
+      {MEAL_SLOTS.map(slot => (
         <SlotSection
           key={slot.id}
           slot={slot}

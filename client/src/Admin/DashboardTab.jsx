@@ -1,14 +1,11 @@
 import { motion } from 'framer-motion'
 import { ShoppingBag, UtensilsCrossed, IndianRupee, Clock, Trophy, BarChart3 } from 'lucide-react'
 import { G, GDARK, GLIGHT, GMID, GMUTE, stagger, fadeUp } from './adminData'
-import imgFullMeals  from '../food_images/Full Meals.jpeg'
-import imgBiryani    from '../food_images/Biriyani.jpeg'
-import imgParotta    from '../food_images/parotta.jpeg'
 
 const topItems = [
-  { name: 'Full Meals',       orders: 10, img: imgFullMeals },
-  { name: 'Chicken Biryani', orders: 7,  img: imgBiryani   },
-  { name: 'Parotta',         orders: 5,  img: imgParotta   },
+  { name: 'Full Meals',      orders: 10, img: '/food_images/Full Meals.jpeg'  },
+  { name: 'Chicken Biryani', orders: 7,  img: '/food_images/Biriyani.jpeg'    },
+  { name: 'Parotta',         orders: 5,  img: '/food_images/parotta.jpeg'     },
 ]
 
 export default function DashboardTab({ orders, menu }) {
