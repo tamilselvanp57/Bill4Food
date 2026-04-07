@@ -61,6 +61,23 @@ const orderLineSchema = new mongoose.Schema({
   lineTotal: { type: Number },
 })
 
+/* ── Payment ────────────────────────────────────────────────── */
+const paymentSchema = new mongoose.Schema(
+  {
+    order:        { type: mongoose.Schema.Types.ObjectId, ref: 'Order', required: true },
+    token:        { type: String, required: true },          // order token e.g. T001
+    amount:       { type: Number, required: true, min: 0 },
+    method:       { type: String, enum: ['UPI', 'Cash', 'Other'], default: 'UPI' },
+    status:       { type: String, enum: ['Initiated', 'Paid', 'Failed'], default: 'Initiated' },
+    upiId:        { type: String, default: '' },             // merchant UPI id
+    payerUpiId:   { type: String, default: '' },             // payer UPI id (future)
+    txnRef:       { type: String, default: '' },             // UPI transaction reference (future)
+    paidAt:       { type: Date,   default: null },
+    failReason:   { type: String, default: '' },
+  },
+  { timestamps: true }
+)
+
 /* ── Order ───────────────────────────────────────────────────── */
 const orderSchema = new mongoose.Schema(
   {
@@ -74,6 +91,8 @@ const orderSchema = new mongoose.Schema(
     servedAt:   { type: Date, default: null },
     paymentRef: { type: String, default: '' },             // UPI txn ref (future)
     upiId:      { type: String, default: '' },             // payer UPI id (future)
+    payment:    { type: mongoose.Schema.Types.ObjectId, ref: 'Payment', default: null },
+    paymentStatus: { type: String, enum: ['Unpaid', 'Paid', 'Failed'], default: 'Unpaid' },
   },
   { timestamps: true }
 )
@@ -115,6 +134,7 @@ const auditLogSchema = new mongoose.Schema(
 export const User     = mongoose.model('User',     userSchema)
 export const MenuItem = mongoose.model('MenuItem', menuItemSchema)
 export const Order    = mongoose.model('Order',    orderSchema)
+export const Payment  = mongoose.model('Payment',  paymentSchema)
 export const Counter  = mongoose.model('Counter',  counterSchema)
 export const Settings = mongoose.model('Settings', settingsSchema)
 export const AuditLog = mongoose.model('AuditLog', auditLogSchema)

@@ -142,6 +142,7 @@ function BillScreen({ token, total, slot, items, lines, time, onBack }) {
 function TokenScreen({ token, total, slot, items, lines, time, onBack }) {
   const [copied, setCopied] = useState(false)
   const [paid,   setPaid]   = useState(false)
+  const [confirming, setConfirming] = useState(false)
   const upiUrl = makeUpiUrl(total, token)
 
   if (paid) return <BillScreen token={token} total={total} slot={slot} items={items} lines={lines} time={time} onBack={onBack} />
@@ -150,6 +151,18 @@ function TokenScreen({ token, total, slot, items, lines, time, onBack }) {
     navigator.clipboard.writeText(UPI_ID)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  const handlePaid = async () => {
+    setConfirming(true)
+    try {
+      await api.confirmPayment(token, { status: 'Paid' })
+    } catch (_) {
+      // best-effort — still show bill even if network fails
+    } finally {
+      setConfirming(false)
+      setPaid(true)
+    }
   }
 
   return (
@@ -241,9 +254,9 @@ function TokenScreen({ token, total, slot, items, lines, time, onBack }) {
         </motion.p>
 
         <div style={{ display: 'flex', gap: 12, marginTop: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
-          <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setPaid(true)}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 28px', borderRadius: 50, border: 'none', background: G, color: '#fff', fontWeight: 800, fontSize: 14, cursor: 'pointer', boxShadow: `0 4px 20px ${G}50` }}>
-            <CheckCircle2 size={16} /> I&apos;ve Paid — Show Bill
+          <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handlePaid}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 28px', borderRadius: 50, border: 'none', background: G, color: '#fff', fontWeight: 800, fontSize: 14, cursor: confirming ? 'not-allowed' : 'pointer', boxShadow: `0 4px 20px ${G}50`, opacity: confirming ? 0.7 : 1 }}>
+            <CheckCircle2 size={16} /> {confirming ? 'Confirming…' : "I've Paid — Show Bill"}
           </motion.button>
           <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={onBack}
             style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 28px', borderRadius: 50, border: `1px solid ${GMID}40`, background: 'rgba(22,163,74,0.15)', color: GMID, fontWeight: 800, fontSize: 14, cursor: 'pointer' }}>
